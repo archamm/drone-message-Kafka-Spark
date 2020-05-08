@@ -1,0 +1,9 @@
+#MQTT Client
+
+##Iniate the broker
+    -sudo apt-get install mosquitto / brew install mosquitto
+    The Mosquitto service will start after installation.
+## Run the client
+    -Get the IP written on the mosquitto service, and put it in MY_IP.
+    -Run the File. usage: python3 utils/mqtt_client.py
+
