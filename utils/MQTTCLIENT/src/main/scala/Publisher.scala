@@ -2,61 +2,43 @@ import org.eclipse.paho.client.mqttv3.{MqttClient, MqttException, MqttMessage}
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence
 
 import Array._
-import scala.util.Random
+import scala.annotation.tailrec
 
 object Publisher {
-  case class WeightedItem[T](item: T, weight: Double)
 
-
-  def weightedSelection[T](
-                            items: Seq[WeightedItem[T]],
-                            numSelections: Int,
-                            r: Random
-                          ): Seq[T] = {
-
-      val totalWeight = items.map(_.weight).sum
-
-      def pick_one: T = {
-        var rnd = r.nextDouble * totalWeight
-        for (i <- items) {
-          if (i.weight > rnd) {
-            return i.item
-          }
-          rnd = rnd - i.weight
-        }
-        // the above should always return something, but compiler doesn't
-        // realise that, hence this:
-        return items.head.item
-      }
-
-      for (i <- 1 to numSelections) yield pick_one
+  @tailrec def forever[A](body: => A): Nothing = {
+    body
+    forever(body)
   }
 
+  def weightedSelect[T](input :(T, Int)*): List[T] = {
+    val items  :Seq[T]    = input.flatMap{x => Seq.fill(x._2)(x._1)}
+    def output :List[T] = util.Random.shuffle(items).toList
+    output
+  }
 
   def main(args: Array[String]) {
     val brokerUrl = "tcp://localhost:1883"
     val topic = "/drones/messages"
     val droneList = range(1, 200)
-    val items = Seq(WeightedItem("BAD_PARKING_0", 33d/100), WeightedItem("BAD_PARKING_1", 33d/100),
-      WeightedItem("BAD_PARKING_2", 33d/100 ), WeightedItem("CANT_TAKE_ACTION", 1d/100 ) )
 
-    println(weightedSelection(items, 1, Random))
-    var client: MqttClient = null
+
 
     // Creating new persistence for mqtt client
     val persistence = new MqttDefaultFilePersistence("/tmp")
+    val client: MqttClient = new MqttClient(brokerUrl, "Drone1", persistence)
 
     try {
       // mqtt client with specific url and client id
-      client = new MqttClient(brokerUrl, "Drone1", persistence)
 
       client.connect()
 
       val msgTopic = client.getTopic(topic)
 
-      while (true) {
+      forever {
         droneList.foreach(droneId => {
-          val msg = "{\"DroneId\": \"%s\", \"message\": \"%s\"}".format(droneId, weightedSelection(items, 1, Random).head)
+          val msg = "{\"DroneId\": \"%s\", \"message\": \"%s\"}".format(droneId, weightedSelect("BAD_PARKING_0" -> 33, "BAD_PARKING_1"-> 33, "BAD_PARKING_2"-> 33,
+            "CANT_TAKE_ACTION"-> 1).take(1).head)
           val message = new MqttMessage(msg.getBytes("utf-8"))
 
           msgTopic.publish(message)
