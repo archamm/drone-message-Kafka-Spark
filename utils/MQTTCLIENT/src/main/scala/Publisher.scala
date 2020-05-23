@@ -1,4 +1,4 @@
-import java.text.SimpleDateFormat
+import java.util.UUID
 
 import org.eclipse.paho.client.mqttv3.{MqttClient, MqttException, MqttMessage}
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence
@@ -10,6 +10,27 @@ import java.time.LocalDateTime
 import java.time._
 
 object Publisher {
+  def buildMessage(droneId:Int): String = {
+    if (isThereAViolation) {
+      println("VIOLATION")
+      "{\"DroneId\": \"%s\", \"violation\": %s, \"date\": \"%s\", \"location\": \"%s\"}".format(droneId, buildViolationObject, getRandomDate, getRandomLocation.toString())
+    }
+    else
+      "{\"DroneId\": \"%s\", \"date\": \"%s\", \"location\": \"%s\"}".format(droneId, getRandomDate, getRandomLocation.toString())
+  }
+
+  def buildViolationObject: String = {
+    "{\"violationId\": \"%s\", \"imageId\": \"%s\", \"violationCode\": \"%s\"}".format(UUID.randomUUID.toString, UUID.randomUUID.toString, getRandomViolation)
+  }
+
+  def isThereAViolation: Boolean = {
+    Random.between(0, 10) < 2
+  }
+
+  def getRandomViolation: String = {
+    weightedSelect("BAD_PARKING_0" -> 33, "BAD_PARKING_1"-> 33, "BAD_PARKING_2"-> 33,
+      "REQUIRE_HUMAN"-> 1).take(1).head
+  }
 
   def getRandomLocation: (Double, Double) = {
     val latitude = Random.between(40.6808, 40.8808)
@@ -56,10 +77,7 @@ object Publisher {
 
       forever {
         droneList.foreach(droneId => {
-          val msg = "{\"DroneId\": \"%s\", \"message\": \"%s\", \"date\": \"%s\", \"location\": \"%s\"}".format(droneId, weightedSelect("BAD_PARKING_0" -> 33, "BAD_PARKING_1"-> 33, "BAD_PARKING_2"-> 33,
-            "CANT_TAKE_ACTION"-> 1).take(1).head, getRandomDate, getRandomLocation.toString())
-          val message = new MqttMessage(msg.getBytes("utf-8"))
-          println(getRandomLocation)
+          val message = new MqttMessage(buildMessage(droneId).getBytes("utf-8"))
           msgTopic.publish(message)
           println("Publishing Data, Topic : %s, Message : %s".format(msgTopic.getName, message))
           Thread.sleep(1000)
