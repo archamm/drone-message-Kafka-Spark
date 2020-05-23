@@ -1,10 +1,29 @@
+import java.text.SimpleDateFormat
+
 import org.eclipse.paho.client.mqttv3.{MqttClient, MqttException, MqttMessage}
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence
 
 import Array._
 import scala.annotation.tailrec
+import scala.util.Random
+import java.time.LocalDateTime
+import java.time._
 
 object Publisher {
+
+  def getRandomLocation: (Double, Double) = {
+    val latitude = Random.between(40.6808, 40.8808)
+    val longitude = Random.between(-73.0772, -72.8772)
+    (latitude, longitude)
+  }
+
+  def getRandomDate: String = {
+    val start = LocalDateTime.of(2020, 1, 20,11,48,34)
+    val end   = LocalDateTime.of(2020, 5, 20, 14,32,55)
+    LocalDateTime.ofEpochSecond(Random.between(start.toEpochSecond(ZoneOffset.UTC),
+      end.toEpochSecond(ZoneOffset.UTC)), 0, ZoneOffset.UTC).toString
+  }
+
 
   @tailrec def forever[A](body: => A): Nothing = {
     body
@@ -37,10 +56,10 @@ object Publisher {
 
       forever {
         droneList.foreach(droneId => {
-          val msg = "{\"DroneId\": \"%s\", \"message\": \"%s\"}".format(droneId, weightedSelect("BAD_PARKING_0" -> 33, "BAD_PARKING_1"-> 33, "BAD_PARKING_2"-> 33,
-            "CANT_TAKE_ACTION"-> 1).take(1).head)
+          val msg = "{\"DroneId\": \"%s\", \"message\": \"%s\", \"date\": \"%s\", \"location\": \"%s\"}".format(droneId, weightedSelect("BAD_PARKING_0" -> 33, "BAD_PARKING_1"-> 33, "BAD_PARKING_2"-> 33,
+            "CANT_TAKE_ACTION"-> 1).take(1).head, getRandomDate, getRandomLocation.toString())
           val message = new MqttMessage(msg.getBytes("utf-8"))
-
+          println(getRandomLocation)
           msgTopic.publish(message)
           println("Publishing Data, Topic : %s, Message : %s".format(msgTopic.getName, message))
           Thread.sleep(1000)
