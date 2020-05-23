@@ -7,7 +7,7 @@ import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
 import com.amazonaws.auth.AWSStaticCredentialsProvider
-import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.model.S3ObjectInputStream
 import org.apache.commons.io.FileUtils
@@ -16,7 +16,9 @@ import scala.annotation.tailrec
 
 object DroneConsumer {
 
-  case class DroneMessage(DroneId: Int, message: String, date: String, location: String)
+  case class DroneMessage(DroneId: Int, violation: ViolationObject, date: String, location: String)
+  case class ViolationObject(violationId: String, imageId: String, violationCode: String)
+  case class MessageObject(regularMsg: String, violationMessage: String)
 
   def main(args: Array[String]): Unit = {
     val topicName = "mqtt.drones-messages"
@@ -51,16 +53,15 @@ object DroneConsumer {
   }
 
 
-  def writeInS3(key: Long, message: String) :Unit = {
+  def writeInS3(key: Long, messageObject: MessageObject) :Unit = {
 
     val bucketName = "drones-messages"          // specifying bucket name
 
     //file to upload
-    val file = new File("drones-messages.csv")
     /* These Keys would be available to you in  "Security Credentials" of
         your Amazon S3 account */
-    val AWS_ACCESS_KEY = "***"
-    val AWS_SECRET_KEY = "***"
+    val AWS_ACCESS_KEY = "AKIAS7AOU2S4LWDP4VVB"
+    val AWS_SECRET_KEY = "d4jC/2g6McJaqz+XUaxbY7YXfWrbIkn3v6PooAtO"
     val provider = new AWSStaticCredentialsProvider(
       new BasicAWSCredentials(AWS_ACCESS_KEY,AWS_SECRET_KEY)
     )
@@ -71,24 +72,38 @@ object DroneConsumer {
       .withRegion("eu-west-3")
       .build
 
-    val o = amazonS3Client.getObject(bucketName, "drones-messages.csv")
+    writeMessageInS3(amazonS3Client, "drones-messages.csv", messageObject.regularMsg, bucketName)
+    if (messageObject.violationMessage != null){
+      writeMessageInS3(amazonS3Client, "drones-violations-messages.csv", messageObject.violationMessage, bucketName)
+    }
+  }
+
+  def writeMessageInS3(amazonS3Client: AmazonS3, fileName: String, message: String, bucketName: String): Boolean = {
+    val file = new File(fileName)
+    val o = amazonS3Client.getObject(bucketName, fileName)
     val s3is = o.getObjectContent
     writeBytes(s3is, file)
     s3is.close()
     val fos = new FileOutputStream(file, true)
     fos.write(message.getBytes)
     fos.write("\n".getBytes)
-
-    amazonS3Client.putObject(bucketName, "drones-messages.csv", file)
+    amazonS3Client.putObject(bucketName, fileName, file)
     FileUtils.deleteQuietly(file)
   }
 
-  def formatDroneMessage(message:String): String = {
+  def formatDroneMessage(message:String): MessageObject = {
     val formattedMessage :String = message.substring(message.indexOf("{"))
     val objectMapper = new ObjectMapper() with ScalaObjectMapper
     objectMapper.registerModule(DefaultScalaModule)
     val droneMessage = objectMapper.readValue(formattedMessage, classOf[DroneMessage])
-    droneMessage.DroneId.toString + " ; " + droneMessage.message + " ; " + droneMessage.date + " ; " + droneMessage.location
+    if (droneMessage.violation != null) {
+       MessageObject(droneMessage.DroneId.toString + " ; " + droneMessage.violation.violationId + " ; " + droneMessage.date + " ; " + droneMessage.location,
+         droneMessage.violation.violationId + " ; " + droneMessage.violation.imageId + " ; " + droneMessage.violation.violationCode)
+    }
+    else {
+        MessageObject(droneMessage.DroneId.toString + " ; " + "" + " ; " + droneMessage.date + " ; " + droneMessage.location,
+          null)
+      }
 
   }
   def writeBytes( data : S3ObjectInputStream, file : File ): Unit = {
