@@ -56,7 +56,7 @@ object Publisher {
 
       while (true) {
         droneList.foreach(droneId => {
-          val msg = "{DroneId: %s, message: %s}".format(droneId, weightedSelection(items, 1, Random).head)
+          val msg = "{\"DroneId\": \"%s\", \"message\": \"%s\"}".format(droneId, weightedSelection(items, 1, Random).head)
           val message = new MqttMessage(msg.getBytes("utf-8"))
 
           msgTopic.publish(message)
