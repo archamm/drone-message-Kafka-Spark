@@ -97,19 +97,20 @@ object DroneConsumer {
     objectMapper.registerModule(DefaultScalaModule)
     val droneMessage = objectMapper.readValue(formattedMessage, classOf[DroneMessage])
     if (droneMessage.violation != null) {
-       MessageObject(droneMessage.DroneId.toString + " ; " + droneMessage.violation.violationId + " ; " + droneMessage.date + " ; " + droneMessage.location,
-         droneMessage.violation.violationId + " ; " + droneMessage.violation.imageId + " ; " + droneMessage.violation.violationCode)
+       MessageObject(droneMessage.DroneId.toString + ";" + droneMessage.violation.violationId + ";" + droneMessage.date + ";" + droneMessage.location,
+         droneMessage.violation.violationId + ";" + droneMessage.violation.imageId + ";" + droneMessage.violation.violationCode)
     }
     else {
-        MessageObject(droneMessage.DroneId.toString + " ; " + "" + " ; " + droneMessage.date + " ; " + droneMessage.location,
+        MessageObject(droneMessage.DroneId.toString + ";" + "" + ";" + droneMessage.date + ";" + droneMessage.location,
           null)
       }
 
   }
   def writeBytes( data : S3ObjectInputStream, file : File ): Unit = {
-    val target = new BufferedOutputStream( new FileOutputStream(file))
+    val target = new BufferedOutputStream( new FileOutputStream(file) )
     try data.readAllBytes().foreach( target.write(_) ) finally target.close()
   }
+
 
 
   @tailrec def forever[A](body: => A): Nothing = {
