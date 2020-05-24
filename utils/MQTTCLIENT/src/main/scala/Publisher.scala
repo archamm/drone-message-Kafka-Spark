@@ -12,7 +12,6 @@ import java.time._
 object Publisher {
   def buildMessage(droneId:Int): String = {
     if (isThereAViolation) {
-      println("VIOLATION")
       "{\"DroneId\": \"%s\", \"violation\": %s, \"date\": \"%s\", \"location\": \"%s\"}".format(droneId, buildViolationObject, getRandomDate, getRandomLocation.toString())
     }
     else
