@@ -1,11 +1,10 @@
 import java.time.LocalDateTime
 
 import org.apache.spark.sql.{Column, Row, SparkSession}
-import org.apache.spark.ml.linalg.{Matrix, Vectors}
-import org.apache.spark.ml.stat.Correlation
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.functions.udf
+import S3Connect.ConnectToS3
 
 object Utils extends java.io.Serializable {
   val getDayOfInfraction: String => String = LocalDateTime.parse(_).getDayOfWeek.toString
@@ -18,14 +17,9 @@ object SparkAnalyze  {
       .master("local[1]")
       .appName("SparkAnalyseRoadViolations")
       .getOrCreate()
-    // Replace Key with your AWS account key (You can find this on IAM)
-    spark.sparkContext
-      .hadoopConfiguration.set("fs.s3a.access.key", "***")
-    // Replace Key with your AWS secret key (You can find this on IAM
-    spark.sparkContext
-      .hadoopConfiguration.set("fs.s3a.secret.key", "***")
-    spark.sparkContext
-      .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
+
+    ConnectToS3(sparkSession = spark, AWSKey = "***", AWSSecretKey = "***")
+
     val dfRegMessages = spark.read.options(Map("inferSchema"->"true","delimiter"->";","header"->"true"))
       .csv("s3a://drones-messages/drones-messages.csv").dropDuplicates()
 
