@@ -10,12 +10,20 @@ import java.time.LocalDateTime
 import java.time._
 
 object Publisher {
+  def time[R](block: => R): R = {
+    val t0 = System.nanoTime()
+    val result = block    // call-by-name
+    val t1 = System.nanoTime()
+    println("Elapsed time: " + (t1 - t0) + "ns" + " or " )
+    result
+  }
   def buildMessage(droneId:Int): String = {
+    val location = getRandomLocation
     if (isThereAViolation) {
-      "{\"DroneId\": \"%s\", \"violation\": %s, \"date\": \"%s\", \"location\": \"%s\"}".format(droneId, buildViolationObject, getRandomDate, getRandomLocation.toString())
+      "{\"DroneId\": \"%s\", \"violation\": %s, \"date\": \"%s\", \"latitude\": %s, \"longitude\": %s}".format(droneId, buildViolationObject, getRandomDate, location._1, location._2)
     }
     else
-      "{\"DroneId\": \"%s\", \"date\": \"%s\", \"location\": \"%s\"}".format(droneId, getRandomDate, getRandomLocation.toString())
+      "{\"DroneId\": \"%s\", \"date\": \"%s\", \"latitude\": %s, \"longitude\": %s}".format(droneId, getRandomDate, location._1, location._2)
   }
 
   def buildViolationObject: String = {
@@ -27,8 +35,9 @@ object Publisher {
   }
 
   def getRandomViolation: String = {
-    weightedSelect("BAD_PARKING_0" -> 33, "BAD_PARKING_1"-> 33, "BAD_PARKING_2"-> 33,
-      "REQUIRE_HUMAN"-> 1).take(1).head
+    time {
+      sample(RandomViolationProbability.itemViolationProbabilityMap)
+    }
   }
 
   def getRandomLocation: (Double, Double) = {
@@ -49,11 +58,27 @@ object Publisher {
     body
     forever(body)
   }
+  final def sample[A](dist: Map[A, Double]): A = {
+    val p = scala.util.Random.nextDouble
+    val it = dist.iterator
+    var accum = 0.0
+    while (it.hasNext) {
+      val (item, itemProb) = it.next
+      accum += itemProb
+      if (accum >= p)
+        return item  // return so that we don't have to search through the whole distribution
+    }
+    sys.error(f"this should never happen")  // needed so it will compile
+  }
 
-  def weightedSelect[T](input :(T, Int)*): List[T] = {
-    val items  :Seq[T]    = input.flatMap{x => Seq.fill(x._2)(x._1)}
-    def output :List[T] = util.Random.shuffle(items).toList
-    output
+  def weightedSelect[T](input :Seq[(T, Int)]): List[T] = {
+    time {
+      val items: Seq[T] = input.flatMap { x => Seq.fill(x._2)(x._1) }
+
+      def output: List[T] = util.Random.shuffle(items).toList
+
+      output
+    }
   }
 
   def main(args: Array[String]) {
