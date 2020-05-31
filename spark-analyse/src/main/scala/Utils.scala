@@ -1,11 +1,13 @@
-import java.time.LocalDateTime
 
-import org.apache.spark.sql.{Column, Row, SparkSession}
-import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.functions.udf
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
-object S3Connect {
+object Utils {
+
+  def readDroneMessageCsv(path:String, sparkSession: SparkSession, schema: StructType):DataFrame = {
+    sparkSession.read.options(Map("delimiter"->";")).schema(schema)
+      .csv(path).dropDuplicates()
+  }
   def ConnectToS3(sparkSession: SparkSession, AWSKey: String, AWSSecretKey:String): Unit ={
     sparkSession.sparkContext
       .hadoopConfiguration.set("fs.s3a.access.key", "AKIAS7AOU2S4LWDP4VVB")
