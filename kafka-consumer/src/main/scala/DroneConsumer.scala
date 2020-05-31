@@ -1,4 +1,4 @@
-import java.io.{BufferedOutputStream, File, FileOutputStream, FileReader}
+import java.io.{BufferedOutputStream, File, FileOutputStream, FileReader, FileWriter}
 import java.time.Duration
 import java.util.{Collections, Properties}
 
@@ -16,7 +16,7 @@ import scala.annotation.tailrec
 
 object DroneConsumer {
 
-  case class DroneMessage(DroneId: Int, violation: ViolationObject, date: String, location: String)
+  case class DroneMessage(DroneId: Int, violation: ViolationObject, date: String, latitude:Double, longitude: Double)
   case class ViolationObject(violationId: String, imageId: String, violationCode: String)
   case class MessageObject(regularMsg: String, violationMessage: String)
 
@@ -72,9 +72,28 @@ object DroneConsumer {
       .withRegion("eu-west-3")
       .build
 
-    writeMessageInS3(amazonS3Client, "drones-messages.csv", messageObject.regularMsg, bucketName)
+    writeMessageInS3(amazonS3Client, "regular-messages/drones-messages.csv", messageObject.regularMsg, bucketName)
     if (messageObject.violationMessage != null){
-      writeMessageInS3(amazonS3Client, "drones-violations-messages.csv", messageObject.violationMessage, bucketName)
+      writeMessageInS3(amazonS3Client, "violation-messages/drones-violations-messages.csv", messageObject.violationMessage, bucketName)
+    }
+  }
+
+  def writeToLocalFiles(message: MessageObject):Unit = {
+    try{
+
+      val fw = new FileWriter("drones-messages.csv", true)
+      val fwVio = new FileWriter("drones-violations-messages.csv", true)
+      try {
+        fw.write("\n" + message.regularMsg )
+        if (message.violationMessage != null)
+          fwVio.write("\n" + message.violationMessage)
+      }
+      finally {
+        fw.close()
+        fwVio.close()
+      }}
+    catch {
+      case e : Exception=>  println("Error when parsing or writing message", e)
     }
   }
 
@@ -85,8 +104,7 @@ object DroneConsumer {
     writeBytes(s3is, file)
     s3is.close()
     val fos = new FileOutputStream(file, true)
-    fos.write(message.getBytes)
-    fos.write("\n".getBytes)
+    fos.write(("\n" + message).getBytes)
     amazonS3Client.putObject(bucketName, fileName, file)
     FileUtils.deleteQuietly(file)
   }
@@ -97,11 +115,12 @@ object DroneConsumer {
     objectMapper.registerModule(DefaultScalaModule)
     val droneMessage = objectMapper.readValue(formattedMessage, classOf[DroneMessage])
     if (droneMessage.violation != null) {
-       MessageObject(droneMessage.DroneId.toString + ";" + droneMessage.violation.violationId + ";" + droneMessage.date + ";" + droneMessage.location,
+       MessageObject(droneMessage.DroneId.toString + ";" + droneMessage.violation.violationId + ";" +
+         droneMessage.date + ";" + droneMessage.latitude + ";" + droneMessage.longitude,
          droneMessage.violation.violationId + ";" + droneMessage.violation.imageId + ";" + droneMessage.violation.violationCode)
     }
     else {
-        MessageObject(droneMessage.DroneId.toString + ";" + "" + ";" + droneMessage.date + ";" + droneMessage.location,
+        MessageObject(droneMessage.DroneId.toString + ";" + "" + ";" + droneMessage.date + ";" + droneMessage.latitude + ";" + droneMessage.longitude,
           null)
       }
 
