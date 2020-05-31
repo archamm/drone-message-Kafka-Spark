@@ -14,7 +14,7 @@ object Publisher {
     val t0 = System.nanoTime()
     val result = block    // call-by-name
     val t1 = System.nanoTime()
-    println("Elapsed time: " + (t1 - t0) + "ns" + " or " )
+    println("Elapsed time: " + (t1 - t0) + "ns")
     result
   }
   def buildMessage(droneId:Int): String = {
