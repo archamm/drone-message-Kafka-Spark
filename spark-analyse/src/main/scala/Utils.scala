@@ -13,9 +13,9 @@ object Utils {
       .hadoopConfiguration.set("fs.s3a.access.key", "AKIAS7AOU2S4LWDP4VVB")
     // Replace Key with your AWS secret key (You can find this on IAM
     sparkSession.sparkContext
-      .hadoopConfiguration.set("fs.s3a.secret.key", "d4jC/2g6McJaqz+XUaxbY7YXfWrbIkn3v6PooAtO")
+      .hadoopConfiguration.set("fs.s3a.secret.key", AWSKey)
     sparkSession.sparkContext
-      .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
+      .hadoopConfiguration.set("fs.s3a.endpoint", AWSSecretKey)
 
   }
 }
