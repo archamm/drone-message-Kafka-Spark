@@ -18,6 +18,8 @@ lazy val root = (project in file(".")).
     ),
 
     libraryDependencies ++= Seq(
+      "com.amazonaws" % "aws-java-sdk" % "1.11.788",
+      "com.amazonaws" % "amazon-kinesis-client" % "1.11.2",
       "org.apache.hadoop" % "hadoop-common" % "3.0.0",
       "javax.activation" % "activation" % "1.1.1",
       "org.apache.hadoop" % "hadoop-client" % "3.0.0",
