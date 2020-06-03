@@ -20,7 +20,7 @@ class ErrorMessage(Enum):
 
 DRONE_IDS = np.arange(200)
 
-MY_IP = '192.168.1.54'
+MY_IP = '192.168.1.25'
 client = mqtt.Client('drone')
 
 
@@ -42,10 +42,11 @@ while True:
     for ID in DRONE_IDS:
         client.loop_start()
         print("Subscribing to topic", "drones/messages")
-        client.subscribe("drones/messages")
+        client.subscribe("/drones/messages")
+        '''
         print("Publishing message to topic", "drones/messages")
         client.publish("drones/messages", "{doneId: " + str(ID)
                        + ", message: "
-                       + ErrorMessage(np.random.choice(np.arange(4), p=[0.33, 0.33, 0.33, 0.01])).name + "}")
+                       + ErrorMessage(np.random.choice(np.arange(4), p=[0.33, 0.33, 0.33, 0.01])).name + "}")'''
         time.sleep(4)
         client.loop_stop()

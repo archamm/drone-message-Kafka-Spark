@@ -1,5 +1,4 @@
 import java.io.{BufferedWriter, FileWriter}
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
@@ -7,7 +6,6 @@ import com.amazonaws.services.s3.{AmazonS3Client, AmazonS3ClientBuilder}
 
 import scala.annotation.tailrec
 import scala.io.Source
-import scala.util.Try
 
 
 object NypdCsvToS3 {
@@ -44,6 +42,8 @@ object NypdCsvToS3 {
         else
           Utils.Point(40.7205994, -74.0083416)
 
+      println(data(19))
+      println(parseTime(data(19)))
       println(coords)
       Map(
         "violationCode" -> data(5),
@@ -71,6 +71,13 @@ object NypdCsvToS3 {
     if (!checkTimeFormat(time)) {
       println("format didn't work")
       "00:00:00"
+    } else if((time(0).toString + time(1).toString).toInt == 12){
+      if (time.contains("P")){
+        time(0).toString + time(1).toString + ":" + time(2).toString + time(3).toString + ":00"
+      }
+      else
+        (((time(0).toString + time(1).toString).toInt - 12)).toString + ":" + time(2).toString + time(3).toString + ":00"
+
     } else if (time.contains("A")){
       time(0).toString + time(1).toString + ":" + time(2).toString + time(3).toString + ":00"
     }

@@ -104,7 +104,7 @@ object Publisher {
           val message = new MqttMessage(buildMessage(droneId).getBytes("utf-8"))
           msgTopic.publish(message)
           println("Publishing Data, Topic : %s, Message : %s".format(msgTopic.getName, message))
-          Thread.sleep(1000)
+          Thread.sleep(300)
 
         })
       }
