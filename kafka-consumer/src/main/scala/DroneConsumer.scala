@@ -11,6 +11,13 @@ import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.model.S3ObjectInputStream
 import org.apache.commons.io.FileUtils
+import com.amazonaws.auth.AWSStaticCredentialsProvider
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.kinesisfirehose.{AmazonKinesisFirehose, AmazonKinesisFirehoseClient}
+import com.amazonaws.services.kinesisfirehose.model.PutRecordRequest
+import java.nio.ByteBuffer
+
+import com.amazonaws.services.kinesisfirehose.model.Record
 
 import scala.annotation.tailrec
 
@@ -36,7 +43,7 @@ object DroneConsumer {
       val records = consumer.poll(Duration.ofMillis(500))
       records.forEach(rec => {
         println(s"message: ${formatDroneMessage(rec.value().toString)}")
-        writeInS3(rec.timestamp(), formatDroneMessage(rec.value().toString))
+        writeInS3(rec.timestamp(), rec.value().toString)
       })
     }
     consumer.close()
@@ -53,29 +60,33 @@ object DroneConsumer {
   }
 
 
-  def writeInS3(key: Long, messageObject: MessageObject) :Unit = {
+  def writeInS3(key: Long, message: String) :Unit = {
 
-    val bucketName = "drones-messages"          // specifying bucket name
 
     //file to upload
     /* These Keys would be available to you in  "Security Credentials" of
         your Amazon S3 account */
-    val AWS_ACCESS_KEY = "AKIAS7AOU2S4LWDP4VVB"
-    val AWS_SECRET_KEY = "d4jC/2g6McJaqz+XUaxbY7YXfWrbIkn3v6PooAtO"
+    val AWS_ACCESS_KEY = "AKIAS7AOU2S4KEKI3Q7K"
+    val AWS_SECRET_KEY = "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"
     val provider = new AWSStaticCredentialsProvider(
       new BasicAWSCredentials(AWS_ACCESS_KEY,AWS_SECRET_KEY)
     )
+    val firehoseClient = AmazonKinesisFirehoseClient.builder.withRegion(Regions.EU_WEST_3)
+      .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(AWS_ACCESS_KEY,AWS_SECRET_KEY))).build
 
-    val amazonS3Client = AmazonS3ClientBuilder
-      .standard
-      .withCredentials(provider)
-      .withRegion("eu-west-3")
-      .build
+    sendToFireHose(firehoseClient, formatForFireHose(message))
+  }
 
-    writeMessageInS3(amazonS3Client, "regular-messages/drones-messages.csv", messageObject.regularMsg, bucketName)
-    if (messageObject.violationMessage != null){
-      writeMessageInS3(amazonS3Client, "violation-messages/drones-violations-messages.csv", messageObject.violationMessage, bucketName)
-    }
+  def sendToFireHose(firehose: AmazonKinesisFirehose, message: String): Unit ={
+    val fireHoseDeliveryStreamName = "drones-messages-flux"
+    val putRecordRequest = new PutRecordRequest()
+    putRecordRequest.setDeliveryStreamName(fireHoseDeliveryStreamName)
+
+    val record = new Record()
+      .withData(ByteBuffer.wrap(message.getBytes))
+    putRecordRequest.setRecord(record)
+    val putRecordResult = firehose.putRecord(putRecordRequest)
+    println(putRecordResult.toString)
   }
 
   def writeToLocalFiles(message: MessageObject):Unit = {
@@ -109,6 +120,22 @@ object DroneConsumer {
     FileUtils.deleteQuietly(file)
   }
 
+  def formatForFireHose(message: String): String ={
+    val formattedMessage :String = message.substring(message.indexOf("{"))
+    val objectMapper = new ObjectMapper() with ScalaObjectMapper
+    objectMapper.registerModule(DefaultScalaModule)
+    val droneMessage = objectMapper.readValue(formattedMessage, classOf[DroneMessage])
+    if (droneMessage.violation != null) {
+      droneMessage.DroneId.toString + ";" + droneMessage.violation.violationId + ";" + droneMessage.violation.imageId +
+        ";" + droneMessage.violation.violationCode + ";" +
+        droneMessage.date + ";" + droneMessage.latitude + ";" + droneMessage.longitude + "\n"
+    }
+    else {
+      droneMessage.DroneId.toString + ";" + "" + ";" + "" +
+        ";" + "" + ";" + droneMessage.date + ";" + droneMessage.latitude + ";" + droneMessage.longitude  + "\n"
+    }
+
+    }
   def formatDroneMessage(message:String): MessageObject = {
     val formattedMessage :String = message.substring(message.indexOf("{"))
     val objectMapper = new ObjectMapper() with ScalaObjectMapper

@@ -6,7 +6,7 @@ lazy val root = (project in file(".")).
     inThisBuild(List(
       organization := "com.example",
       scalaVersion := "2.13.2",
-      version      := "0.1.0-SNAPSHOT"
+      version      := "0.3.0-SNAPSHOT"
     )),
     name := "kafka-consumer",
     version := "0.1",
@@ -18,6 +18,7 @@ lazy val root = (project in file(".")).
 
     libraryDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk" % "1.11.788",
+      "com.amazonaws" % "amazon-kinesis-client" % "1.11.2",
       "com.typesafe" % "config" % "1.3.2",
       "org.apache.kafka" % "kafka-clients" % "2.4.0",
       "org.apache.kafka" % "connect-json" % "2.4.0",
