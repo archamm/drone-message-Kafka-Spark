@@ -18,8 +18,8 @@ object SparkAnalyze  {
       .appName("SparkAnalyseRoadViolations")
       .getOrCreate()
 
-    val accessKey = "AKIAS7AOU2S4LWDP4VVB"
-    val secretAccessKey = "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"
+    val accessKey = "AKIAS7AOU2S4KEKI3Q7K"
+    val secretAccessKey = "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"
 
     ConnectToS3(sparkSession = spark, AWSKey = accessKey, AWSSecretKey = secretAccessKey)
 
@@ -27,37 +27,31 @@ object SparkAnalyze  {
     val schemaMessage = StructType(Seq(
       StructField("droneId", StringType, nullable = true),
       StructField("violationId", StringType, nullable = true),
+      StructField("imageId", StringType, nullable = true),
+      StructField("violationCode", IntegerType, nullable = true),
       StructField("date", StringType, nullable = true),
       StructField("latitude", DoubleType, nullable = true),
       StructField("longitude", DoubleType, nullable = true)))
 
 
-    val s3RegPath = "s3a://drones-messages/regular-messages/"
-    val dfRegMessages = readDroneMessageCsv("/Users/matthieuarchambault/Documents/Epita/SCIA-COURS/Scala - SPARK/scala_prestacops/NYPDCsvToS3/DEST/reg", spark, schemaMessage)
+    val s3DronesMsgPath = "s3a://drones-message-via-firehose/*/*/*/*/*"
+    val s3NYPDMsgPath = "s3a://nypd-messages-via-firehose/*/*/*/*/*"
+
+    val dfRegMessages = readDroneMessageCsv(s3DronesMsgPath, spark, schemaMessage)
     dfRegMessages.printSchema()
-    dfRegMessages.show()
-    dfRegMessages.printSchema()
+    val count1 = dfRegMessages.count()
+    println("TOTAL DRONES ROWS: " + count1)
 
-    val schemaMessageViolation = StructType(
-      StructField("violationId", StringType, nullable = true) ::
-        StructField("imageId", StringType, nullable = true) ::
-        StructField("violationCode", IntegerType, nullable = true) :: Nil)
-
-    val s3VioPath = "s3a://drones-messages/violation-messages/"
-    val dfViolationMessages = readDroneMessageCsv("/Users/matthieuarchambault/Documents/Epita/SCIA-COURS/Scala - SPARK/scala_prestacops/NYPDCsvToS3/DEST/vio", spark, schemaMessageViolation)
-    dfViolationMessages.show()
-    dfViolationMessages.printSchema()
-
-    val joinedViolationDf = dfRegMessages.join(
-      dfViolationMessages,
-      Seq("violationId"),
-    "left")
-    joinedViolationDf.show()
-    joinedViolationDf.printSchema()
+    val dfNYPDMessages = readDroneMessageCsv(s3NYPDMsgPath, spark, schemaMessage)
+      dfNYPDMessages.cache()
+      val count = dfNYPDMessages.count()
+      println("TOTAL NYPD MESSAGE ROWS: " + count)
 
 
-    joinedViolationDf.withColumn("date",
-      to_timestamp(col("date"), "dd/MM/yyyy'T'HH:mm:ss"))
+
+
+    dfNYPDMessages.withColumn("date",
+      to_timestamp(col("date"), "yyyy-MM-dd'T'HH:mm:ss"))
       .withColumn("week_day_number", date_format(col("date"), "u"))
       .withColumn("week_day_abb", date_format(col("date"), "E"))
       .show()

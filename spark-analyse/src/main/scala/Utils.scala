@@ -10,12 +10,12 @@ object Utils {
   }
   def ConnectToS3(sparkSession: SparkSession, AWSKey: String, AWSSecretKey:String): Unit ={
     sparkSession.sparkContext
-      .hadoopConfiguration.set("fs.s3a.access.key", "AKIAS7AOU2S4LWDP4VVB")
+      .hadoopConfiguration.set("fs.s3a.access.key", AWSKey)
     // Replace Key with your AWS secret key (You can find this on IAM
     sparkSession.sparkContext
-      .hadoopConfiguration.set("fs.s3a.secret.key", AWSKey)
+      .hadoopConfiguration.set("fs.s3a.secret.key", AWSSecretKey)
     sparkSession.sparkContext
-      .hadoopConfiguration.set("fs.s3a.endpoint", AWSSecretKey)
+      .hadoopConfiguration.set("fs.s3a.endpoint", "s3.amazonaws.com")
 
   }
 }
