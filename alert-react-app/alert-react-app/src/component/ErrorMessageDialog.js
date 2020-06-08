@@ -34,6 +34,7 @@ export default function ErrorCodeMessageDialog(props) {
           <CardActionArea>
             <CardMedia
               component="iframe"
+              style={{height: '400px'}}
               src={"https://maps.google.com/maps?q=" + message.latitude + ", " + message.longitude + "&z=15&output=embed"}
               title="Location"
             />

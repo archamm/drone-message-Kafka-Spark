@@ -17,7 +17,7 @@ function App() {
 
   return (
     <div styles={{ backgroundImage:`url(${background})` }}>
-      <ErrorMessageList messages={messages}/>
+      <ErrorMessageList messages={messages} setMessages={setMessages}/>
     </div>
   );
 }

@@ -5,8 +5,10 @@ import WarningIcon from "@material-ui/icons/Warning";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import ListSubheader from "@material-ui/core/Divider";
 import ErrorMessageDialog from "./ErrorMessageDialog";
+import ClearIcon from "@material-ui/icons/Clear";
+import IconButton from '@material-ui/core/IconButton';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -45,6 +47,9 @@ const ErrorMessageList = (props) => {
     setCurrentMsg(message);
     setOpen(true);
   };
+  const deleteMessage = (message) => {
+    props.setMessages(props.messages.filter((m) => m !== message));
+  };
 
   return (
     <div>
@@ -55,29 +60,28 @@ const ErrorMessageList = (props) => {
           marginTop: "25px",
           padding: "30px",
           borderRadius: "30px",
+          border: "3px solid black",
         }}
-        component="nav"
-        aria-labelledby="nested-list-subheader"
-        subheader={
-          <ListSubheader
-            style={{ marginBottom: "30px" }}
-            component="div"
-            id="nested-list-subheader"
-          >
-            Drone Code 100 Message List
-          </ListSubheader>
-        }
         className={classes.root}
       >
+        <h2 style={{ marginBottom: "30px" }}>Drone Code 100 Message List </h2>
         {props.messages.map((m, i) => (
-          <ErrorMessageItem
-            message={m}
-            key={i}
-            handleClickOpen={handleClickOpen}
-          />
+          <div style={{display: 'flex', flexDirection: 'row'}}>
+            <ErrorMessageItem
+              message={m}
+              key={i}
+              handleClickOpen={handleClickOpen}
+            />
+            <IconButton
+              style={{ marginLeft: "auto" }}
+              onClick={(e) => deleteMessage(m)}
+            >
+              <ClearIcon />
+            </IconButton>
+          </div>
         ))}
       </List>
-      <ErrorMessageDialog open={open} setOpen={setOpen} message={currentMsg}/>
+      <ErrorMessageDialog open={open} setOpen={setOpen} message={currentMsg} />
     </div>
   );
 };
