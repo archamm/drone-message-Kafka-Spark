@@ -1,0 +1,1421 @@
+﻿{
+  "paragraphs": [
+    {
+      "text": "import java.time.LocalDateTime\n\nimport org.apache.spark.sql.{Column, Dataset, Row, SparkSession, DataFrame}\nimport org.apache.spark.sql.expressions.UserDefinedFunction\nimport org.apache.spark.sql.functions.{col, to_timestamp,date_format, udf, hour}\n import org.apache.spark.sql.types._\nimport org.apache.spark.sql.types.StructType\nimport java.time.format.DateTimeFormatter\nimport org.apache.spark.serializer.KryoSerializer\nimport org.datasyslab.geosparkviz.core.Serde.GeoSparkVizKryoRegistrator\nimport org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator\nimport org.datasyslab.geosparkviz.sql.utils.GeoSparkVizRegistrator\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T11:51:27+0200",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import java.time.LocalDateTime\nimport org.apache.spark.sql.{Column, Dataset, Row, SparkSession, DataFrame}\nimport org.apache.spark.sql.expressions.UserDefinedFunction\nimport org.apache.spark.sql.functions.{col, to_timestamp, date_format, udf, hour}\nimport org.apache.spark.sql.types._\nimport org.apache.spark.sql.types.StructType\nimport java.time.format.DateTimeFormatter\nimport org.apache.spark.serializer.KryoSerializer\nimport org.datasyslab.geosparkviz.core.Serde.GeoSparkVizKryoRegistrator\nimport org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator\nimport org.datasyslab.geosparkviz.sql.utils.GeoSparkVizRegistrator\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590931112668_-2109815497",
+      "id": "paragraph_1590925701526_1824691674",
+      "dateCreated": "2020-05-31T15:18:32+0200",
+      "dateStarted": "2020-06-09T11:51:27+0200",
+      "dateFinished": "2020-06-09T11:51:38+0200",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:180"
+    },
+    {
+      "text": "\n  def readDroneMessageCsv(path:String, sparkSession: SparkSession, schema: StructType):DataFrame = {\n    sparkSession.read.options(Map(\"delimiter\"->\";\")).schema(schema)\n      .csv(path).dropDuplicates()\n  }\n\ndef ConnectToS3(sparkSession: SparkSession, AWSKey: String, AWSSecretKey:String): Unit ={\n  sparkSession.sparkContext\n    .hadoopConfiguration.set(\"fs.s3a.access.key\", AWSKey)\n  // Replace Key with your AWS secret key (You can find this on IAM\n  sparkSession.sparkContext\n    .hadoopConfiguration.set(\"fs.s3a.secret.key\", AWSSecretKey)\n  sparkSession.sparkContext\n    .hadoopConfiguration.set(\"fs.s3a.endpoint\", \"s3.amazonaws.com\")\n\n}",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T11:51:58+0200",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mreadDroneMessageCsv\u001b[0m: \u001b[1m\u001b[32m(path: String, sparkSession: org.apache.spark.sql.SparkSession, schema: org.apache.spark.sql.types.StructType)org.apache.spark.sql.DataFrame\u001b[0m\n\u001b[1m\u001b[34mConnectToS3\u001b[0m: \u001b[1m\u001b[32m(sparkSession: org.apache.spark.sql.SparkSession, AWSKey: String, AWSSecretKey: String)Unit\u001b[0m\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590931112669_-2145681397",
+      "id": "paragraph_1590926988637_1573564385",
+      "dateCreated": "2020-05-31T15:18:32+0200",
+      "dateStarted": "2020-06-09T11:51:58+0200",
+      "dateFinished": "2020-06-09T11:51:59+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:181"
+    },
+    {
+      "text": "val spark: SparkSession = SparkSession.builder()\n  .master(\"local[1]\")\n  .appName(\"SparkAnalyseRoadViolations\")\n  .config(\"spark.serializer\", classOf[KryoSerializer].getName)\n  .config(\"spark.kryo.registrator\", classOf[GeoSparkVizKryoRegistrator].getName)\n  .getOrCreate()\n  \nGeoSparkSQLRegistrator.registerAll(spark)\nGeoSparkVizRegistrator.registerAll(spark)\n\nval accessKey = \"AKIAS7AOU2S4KEKI3Q7K\"\nval secretAccessKey = \"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\"\n\nConnectToS3(sparkSession = spark, AWSKey = accessKey, AWSSecretKey = secretAccessKey)\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T11:52:08+0200",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mspark\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.SparkSession\u001b[0m = org.apache.spark.sql.SparkSession@7229f905\n\u001b[1m\u001b[34maccessKey\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m = AKIAS7AOU2S4KEKI3Q7K\n\u001b[1m\u001b[34msecretAccessKey\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m = nw9S4aHLcOcIMRvo2MWrz6+/A/wKGL9YowLi9Tpt\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590931112669_-1668748580",
+      "id": "paragraph_1590926997787_-334524863",
+      "dateCreated": "2020-05-31T15:18:32+0200",
+      "dateStarted": "2020-06-09T11:52:08+0200",
+      "dateFinished": "2020-06-09T11:52:09+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:182"
+    },
+    {
+      "text": "val schemaMessage = StructType(Seq(\n    StructField(\"droneId\", StringType, nullable = true),\n    StructField(\"violationId\", StringType, nullable = true),\n      StructField(\"date\", StringType, nullable = true),\n    StructField(\"latitude\", DoubleType, nullable = true),\n    StructField(\"longitude\", DoubleType, nullable = true))) \n\n\n\nval dfRegMessages = readDroneMessageCsv(\"s3a://drones-messages/regular-messages/\", spark, schemaMessage)\ndfRegMessages.printSchema()\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-05-31T16:30:48+0200",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "root\n |-- droneId: string (nullable = true)\n |-- violationId: string (nullable = true)\n |-- date: string (nullable = true)\n |-- latitude: double (nullable = true)\n |-- longitude: double (nullable = true)\n\n\u001b[1m\u001b[34mschemaMessage\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.types.StructType\u001b[0m = StructType(StructField(droneId,StringType,true), StructField(violationId,StringType,true), StructField(date,StringType,true), StructField(latitude,DoubleType,true), StructField(longitude,DoubleType,true))\n\u001b[1m\u001b[34mdfRegMessages\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [droneId: string, violationId: string ... 3 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590931112669_-522147332",
+      "id": "paragraph_1590927010569_-1786873118",
+      "dateCreated": "2020-05-31T15:18:32+0200",
+      "dateStarted": "2020-05-31T16:30:48+0200",
+      "dateFinished": "2020-05-31T16:30:50+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:183"
+    },
+    {
+      "text": "    val schemaMessage = StructType(Seq(\n      StructField(\"droneId\", StringType, nullable = true),\n      StructField(\"violationId\", StringType, nullable = true),\n      StructField(\"imageId\", StringType, nullable = true),\n      StructField(\"violationCode\", IntegerType, nullable = true),\n      StructField(\"date\", StringType, nullable = true),\n      StructField(\"latitude\", DoubleType, nullable = true),\n      StructField(\"longitude\", DoubleType, nullable = true)))\n\n\n    val s3DronesMsgPath = \"s3a://drones-message-via-firehose/*/*/*/*/*\"\n    val s3NYPDMsgPath = \"s3a://nypd-messages-via-firehose/*/*/*/*/*\"\n\n    val dfRegMessages = readDroneMessageCsv(s3DronesMsgPath, spark, schemaMessage)\n\n    val dfNYPDMessages = readDroneMessageCsv(s3NYPDMsgPath, spark, schemaMessage)\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T11:52:47+0200",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mschemaMessage\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.types.StructType\u001b[0m = StructType(StructField(droneId,StringType,true), StructField(violationId,StringType,true), StructField(imageId,StringType,true), StructField(violationCode,IntegerType,true), StructField(date,StringType,true), StructField(latitude,DoubleType,true), StructField(longitude,DoubleType,true))\n\u001b[1m\u001b[34ms3DronesMsgPath\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m = s3a://drones-message-via-firehose/*/*/*/*/*\n\u001b[1m\u001b[34ms3NYPDMsgPath\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m = s3a://nypd-messages-via-firehose/*/*/*/*/*\n\u001b[1m\u001b[34mdfRegMessages\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [droneId: string, violationId: string ... 5 more fields]\n\u001b[1m\u001b[34mdfNYPDMessages\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [droneId: string, violationId: st..."
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590931112669_609378612",
+      "id": "paragraph_1590927026523_-406957172",
+      "dateCreated": "2020-05-31T15:18:32+0200",
+      "dateStarted": "2020-06-09T11:52:47+0200",
+      "dateFinished": "2020-06-09T11:52:53+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:184"
+    },
+    {
+      "text": "var pointdf = spark.read.format(\"csv\").option(\"delimiter\", \",\").option(\"header\", \"false\").load(\"locationNYPDv2\").na.drop()\npointdf.show()\npointdf.registerTempTable(\"pointtable\")\nspark.sql(\n  \"\"\"\n    |CREATE OR REPLACE TEMP VIEW pointtable AS\n    |SELECT ST_Point(cast(pointtable._c1 as Decimal(24,20)),cast(pointtable._c0 as Decimal(24,20))) as shape\n    |FROM pointtable\n  \"\"\".stripMargin)\nspark.sql(\n  \"\"\"\n    |CREATE OR REPLACE TEMP VIEW pointtable AS\n    |SELECT *\n    |FROM pointtable\n    |WHERE ST_Contains(ST_PolygonFromEnvelope(-126.790180,24.863836,-64.630926,50.000),shape)\n  \"\"\".stripMargin)\nspark.sql(\n  \"\"\"\n    |CREATE OR REPLACE TEMP VIEW boundtable AS\n    |SELECT ST_Envelope_Aggr(shape) as bound FROM pointtable\n  \"\"\".stripMargin)\nspark.sql(\n  \"\"\"\n    |CREATE OR REPLACE TEMP VIEW pixels AS\n    |SELECT pixel, shape FROM pointtable\n    |LATERAL VIEW ST_Pixelize(ST_Transform(shape, 'epsg:4326','epsg:3857'), 256, 256, (SELECT ST_Transform(bound, 'epsg:4326','epsg:3857') FROM boundtable)) AS pixel\n  \"\"\".stripMargin)\nspark.sql(\n  \"\"\"\n    |CREATE OR REPLACE TEMP VIEW pixelaggregates AS\n    |SELECT pixel, count(*) as weight\n    |FROM pixels\n    |GROUP BY pixel\n  \"\"\".stripMargin)\nspark.sql(\n  \"\"\"\n    |CREATE OR REPLACE TEMP VIEW images AS\n    |SELECT ST_EncodeImage(ST_Render(pixel, ST_Colorize(weight, (SELECT max(weight) FROM pixelaggregates)))) AS image, (SELECT ST_AsText(bound) FROM boundtable) AS boundary\n    |FROM pixelaggregates\n  \"\"\".stripMargin)\nspark.table(\"images\").show()\nspark.sql(\n  \"\"\"\n    |CREATE OR REPLACE TEMP VIEW wktpoint AS\n    |SELECT ST_AsText(shape) as geom\n    |FROM pointtable\n  \"\"\".stripMargin)\n  ",
+      "user": "anonymous",
+      "dateUpdated": "2020-05-31T20:59:19+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[33mwarning: \u001b[0mthere was one deprecation warning; re-run with -deprecation for details\n+----------+-----------+\n|       _c0|        _c1|\n+----------+-----------+\n|40.7430399|-73.9547439|\n| 40.742185| -73.992602|\n|40.7841202|-73.9750749|\n|40.7623558|-73.8269924|\n|40.8308431|-73.8273228|\n|40.8561111|-73.8444444|\n|40.7964779| -73.967428|\n|40.7567621|-73.9707859|\n| 40.574106|-74.1055194|\n|40.7670729|-73.9638697|\n|40.7567621|-73.9707859|\n|40.7205994|-74.0083416|\n|40.8308431|-73.8273228|\n|40.7841202|-73.9750749|\n|40.6052621|-74.1621293|\n|40.7670729|-73.9638697|\n|40.7222459| -73.851115|\n|40.7623558|-73.8269924|\n|40.8006901| -73.941118|\n|40.7670729|-73.9638697|\n+----------+-----------+\nonly showing top 20 rows\n\n+--------------------+--------------------+\n|               image|            boundary|\n+--------------------+--------------------+\n|iVBORw0KGgoAAAANS...|POLYGON ((-74.249...|\n+--------------------+--------------------+\n\n\u001b[1m\u001b[34mpointdf\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [_c0: string, _c1: string]\n\u001b[1m\u001b[34mres38\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = []\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590934308740_503299903",
+      "id": "paragraph_1590934308740_503299903",
+      "dateCreated": "2020-05-31T16:11:48+0200",
+      "dateStarted": "2020-05-31T20:59:19+0200",
+      "dateFinished": "2020-05-31T21:34:17+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:185"
+    },
+    {
+      "text": "import org.datasyslab.geosparkviz.core.ImageSerializableWrapper\n\nval image = spark.table(\"images\").take(1)(0)(0).asInstanceOf[ImageSerializableWrapper].getImage\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-05-31T22:02:31+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "ERROR",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "org.apache.spark.SparkException: Exception thrown in awaitResult:\n  at org.apache.spark.util.ThreadUtils$.awaitResult(ThreadUtils.scala:226)\n  at org.apache.spark.sql.execution.SubqueryExec.executeCollect(basicPhysicalOperators.scala:681)\n  at org.apache.spark.sql.execution.ScalarSubquery.updateResult(subquery.scala:67)\n  at org.apache.spark.sql.execution.SparkPlan$$anonfun$waitForSubqueries$1.apply(SparkPlan.scala:185)\n  at org.apache.spark.sql.execution.SparkPlan$$anonfun$waitForSubqueries$1.apply(SparkPlan.scala:184)\n  at scala.collection.mutable.ResizableArray$class.foreach(ResizableArray.scala:59)\n  at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:48)\n  at org.apache.spark.sql.execution.SparkPlan.waitForSubqueries(SparkPlan.scala:184)\n  at org.apache.spark.sql.execution.SparkPlan$$anonfun$executeQuery$1.apply(SparkPlan.scala:154)\n  at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:151)\n  at org.apache.spark.sql.execution.SparkPlan.executeQuery(SparkPlan.scala:152)\n  at org.apache.spark.sql.execution.SparkPlan.execute(SparkPlan.scala:127)\n  at org.apache.spark.sql.execution.SparkPlan.getByteArrayRdd(SparkPlan.scala:247)\n  at org.apache.spark.sql.execution.SparkPlan.executeTake(SparkPlan.scala:339)\n  at org.apache.spark.sql.execution.CollectLimitExec.executeCollect(limit.scala:38)\n  at org.apache.spark.sql.Dataset.org$apache$spark$sql$Dataset$$collectFromPlan(Dataset.scala:3389)\n  at org.apache.spark.sql.Dataset$$anonfun$head$1.apply(Dataset.scala:2550)\n  at org.apache.spark.sql.Dataset$$anonfun$head$1.apply(Dataset.scala:2550)\n  at org.apache.spark.sql.Dataset$$anonfun$52.apply(Dataset.scala:3370)\n  at org.apache.spark.sql.execution.SQLExecution$$anonfun$withNewExecutionId$1.apply(SQLExecution.scala:78)\n  at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:125)\n  at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:73)\n  at org.apache.spark.sql.Dataset.withAction(Dataset.scala:3369)\n  at org.apache.spark.sql.Dataset.head(Dataset.scala:2550)\n  at org.apache.spark.sql.Dataset.take(Dataset.scala:2764)\n  ... 53 elided\nCaused by: org.apache.spark.SparkException: Job 221 cancelled part of cancelled job group zeppelin|anonymous|2F946RQFG|paragraph_1590940587492_1288427446\n  at org.apache.spark.scheduler.DAGScheduler.org$apache$spark$scheduler$DAGScheduler$$failJobAndIndependentStages(DAGScheduler.scala:1889)\n  at org.apache.spark.scheduler.DAGScheduler.handleJobCancellation(DAGScheduler.scala:1824)\n  at org.apache.spark.scheduler.DAGScheduler$$anonfun$handleJobGroupCancelled$1.apply$mcVI$sp(DAGScheduler.scala:906)\n  at org.apache.spark.scheduler.DAGScheduler$$anonfun$handleJobGroupCancelled$1.apply(DAGScheduler.scala:906)\n  at org.apache.spark.scheduler.DAGScheduler$$anonfun$handleJobGroupCancelled$1.apply(DAGScheduler.scala:906)\n  at scala.collection.mutable.HashSet.foreach(HashSet.scala:78)\n  at org.apache.spark.scheduler.DAGScheduler.handleJobGroupCancelled(DAGScheduler.scala:906)\n  at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:2079)\n  at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:2059)\n  at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:2048)\n  at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:49)\n  at org.apache.spark.scheduler.DAGScheduler.runJob(DAGScheduler.scala:737)\n  at org.apache.spark.SparkContext.runJob(SparkContext.scala:2061)\n  at org.apache.spark.SparkContext.runJob(SparkContext.scala:2082)\n  at org.apache.spark.SparkContext.runJob(SparkContext.scala:2101)\n  at org.apache.spark.SparkContext.runJob(SparkContext.scala:2126)\n  at org.apache.spark.rdd.RDD$$anonfun$collect$1.apply(RDD.scala:945)\n  at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:151)\n  at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)\n  at org.apache.spark.rdd.RDD.withScope(RDD.scala:363)\n  at org.apache.spark.rdd.RDD.collect(RDD.scala:944)\n  at org.apache.spark.sql.execution.SparkPlan.executeCollect(SparkPlan.scala:299)\n  at org.apache.spark.sql.execution.SubqueryExec$$anonfun$relationFuture$1$$anonfun$apply$3.apply(basicPhysicalOperators.scala:660)\n  at org.apache.spark.sql.execution.SubqueryExec$$anonfun$relationFuture$1$$anonfun$apply$3.apply(basicPhysicalOperators.scala:657)\n  at org.apache.spark.sql.execution.SQLExecution$$anonfun$withExecutionId$1.apply(SQLExecution.scala:101)\n  at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:125)\n  at org.apache.spark.sql.execution.SQLExecution$.withExecutionId(SQLExecution.scala:98)\n  at org.apache.spark.sql.execution.SubqueryExec$$anonfun$relationFuture$1.apply(basicPhysicalOperators.scala:657)\n  at org.apache.spark.sql.execution.SubqueryExec$$anonfun$relationFuture$1.apply(basicPhysicalOperators.scala:657)\n  at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24)\n  at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24)\n  ... 3 more\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590940587492_1288427446",
+      "id": "paragraph_1590940587492_1288427446",
+      "dateCreated": "2020-05-31T17:56:27+0200",
+      "dateStarted": "2020-05-31T22:02:31+0200",
+      "dateFinished": "2020-05-31T22:12:33+0200",
+      "status": "ABORT",
+      "$$hashKey": "object:186"
+    },
+    {
+      "title": "Which Violation Code is the most likely to occur ?",
+      "text": "z.show(dfNYPDMessages\n    .filter(\"violationCode IS NOT null\")\n    .groupBy(\"violationCode\")\n    .count()\n    .orderBy(\"violationCode\"))",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T11:54:44+0200",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 344,
+              "optionOpen": false,
+              "setting": {
+                "multiBarChart": {
+                  "xLabelStatus": "default",
+                  "rotate": {
+                    "degree": "-45"
+                  }
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "violationCode",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "count",
+                  "index": 1,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "violationCode\tcount\n0\t21\n1\t18\n2\t14\n3\t15\n4\t748\n5\t131519\n6\t314\n7\t433211\n8\t2800\n9\t9122\n10\t28384\n11\t4068\n12\t73\n13\t30720\n14\t851687\n15\t91\n16\t219168\n17\t99025\n18\t19909\n19\t287481\n20\t545170\n21\t1239589\n22\t46\n23\t2757\n24\t23812\n25\t299\n26\t191\n27\t11560\n28\t22\n29\t45\n30\t29\n31\t173028\n32\t279\n33\t25\n34\t686\n35\t5794\n36\t89759\n37\t738574\n38\t1243473\n39\t11677\n40\t455481\n41\t4874\n42\t86563\n43\t449\n44\t49\n45\t31764\n46\t462318\n47\t117660\n48\t54313\n49\t1614\n50\t81456\n51\t59817\n52\t1067\n53\t25541\n54\t65\n55\t363\n56\t212\n57\t144\n58\t66\n59\t462\n60\t12296\n61\t12190\n62\t5323\n63\t1080\n64\t15207\n65\t166\n66\t21820\n67\t33046\n68\t13200\n69\t259480\n70\t219239\n71\t519164\n72\t9334\n73\t4562\n74\t81624\n75\t5657\n76\t43\n77\t18924\n78\t76955\n79\t817\n80\t7958\n81\t191\n82\t30922\n83\t25817\n84\t51650\n85\t28788\n86\t137\n87\t30\n88\t92\n89\t3374\n90\t134\n91\t2052\n92\t137\n93\t62\n94\t2156\n95\t471\n96\t126\n97\t221\n98\t40326\n99\t5981\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590931112669_350704773",
+      "id": "paragraph_1590927635834_26982860",
+      "dateCreated": "2020-05-31T15:18:32+0200",
+      "dateStarted": "2020-05-31T15:21:57+0200",
+      "dateFinished": "2020-05-31T15:22:53+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:187"
+    },
+    {
+      "user": "anonymous",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590949485250_-430389904",
+      "id": "paragraph_1590949485250_-430389904",
+      "dateCreated": "2020-05-31T20:24:45+0200",
+      "status": "READY",
+      "$$hashKey": "object:188"
+    },
+    {
+      "user": "anonymous",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590949484918_1503208652",
+      "id": "paragraph_1590949484918_1503208652",
+      "dateCreated": "2020-05-31T20:24:44+0200",
+      "status": "READY",
+      "$$hashKey": "object:189"
+    },
+    {
+      "title": "Which day sees the most violation?",
+      "text": "z.show(\n    df.withColumn(\"date\",\n   to_timestamp(col(\"date\"), \"dd/MM/yyyy'T'HH:mm:ss\"))\n  .withColumn(\"week_day_number\", date_format(col(\"date\"), \"u\"))\n  .withColumn(\"Day of the week of violation\", date_format(col(\"date\"), \"E\"))\n  .filter(\"violationId IS NOT NULL\")\n  .groupBy(\"Day of the week of violation\")\n  .count()\n  .orderBy(\"count\")\n  .na.drop()\n    )",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T11:54:17+0200",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Day of the week of violation": "string",
+                      "count": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Day of the week of violation",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "count",
+                  "index": 1,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Day of the week of violation\tcount\nSun\t406137\nSat\t1031788\nWed\t1448663\nMon\t1453642\nFri\t1556720\nThu\t1574552\nTue\t1628512\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590931112670_455569805",
+      "id": "paragraph_1590927646353_-874576171",
+      "dateCreated": "2020-05-31T15:18:32+0200",
+      "dateStarted": "2020-05-31T15:22:53+0200",
+      "dateFinished": "2020-05-31T15:25:59+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:190"
+    },
+    {
+      "title": "Average Locations of Infractions",
+      "text": "%sql\nSELECT *\nFROM wktpoint",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T12:58:54+0200",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "geospark-zeppelin",
+              "height": 300,
+              "optionOpen": true,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "image": "string",
+                      "boundary": "string",
+                      "I am the map center!": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "geospark-zeppelin": {
+                  "geometry": {
+                    "name": "geom",
+                    "index": 0,
+                    "aggr": "sum"
+                  }
+                }
+              }
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "geom\nPOINT (-73.9547439 40.7430399)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.8444444 40.8561111)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.1055194 40.574106)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.9750749 40.7841202)\nPOINT (-74.1621293 40.6052621)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.941118 40.8006901)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9049613 40.6484905)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9547439 40.7430399)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.9547439 40.7430399)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.8164846 40.5862476)\nPOINT (-74.0774176 40.6446438)\nPOINT (-73.899523 40.702873)\nPOINT (-73.8755332 40.7568436)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.9001068 40.8540411)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.7676997 40.7602789)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.9041923 40.767446)\nPOINT (-74.0226356 40.6389639)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.895512 40.8161856)\nPOINT (-73.8698072 40.822877)\nPOINT (-73.8475 40.8875)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9598669 40.6487106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9416067 40.6279617)\nPOINT (-73.9547439 40.7430399)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.9547439 40.7430399)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9974633 40.7161816)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9974633 40.7161816)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.899523 40.702873)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.899523 40.702873)\nPOINT (-73.9750749 40.7841202)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.9302453 40.6747739)\nPOINT (-73.953204 40.726806)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.9604845 40.6900842)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9242145 40.6897012)\nPOINT (-73.9302453 40.6747739)\nPOINT (-73.9049613 40.6484905)\nPOINT (-73.953204 40.726806)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.992602 40.742185)\nPOINT (-73.8204516 40.6766506)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.953204 40.726806)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9741762 40.6809072)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.9750749 40.7841202)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.9001068 40.8540411)\nPOINT (-73.9001068 40.8540411)\nPOINT (-73.9741762 40.6809072)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9024173 40.8834823)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.9837703 40.7162871)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0010756 40.658188)\nPOINT (-73.8979807 40.8442012)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.899523 40.702873)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.9598669 40.6487106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9041923 40.767446)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9760975 40.576515)\nPOINT (-73.9604873 40.5941714)\nPOINT (-74.0010756 40.658188)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9598669 40.6487106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.8475 40.8875)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.992602 40.742185)\nPOINT (-73.992602 40.742185)\nPOINT (-73.992602 40.742185)\nPOINT (-73.8204516 40.6766506)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.8269924 40.7623558)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.9837703 40.7162871)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.992602 40.742185)\nPOINT (-73.992602 40.742185)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.8475 40.8875)\nPOINT (-73.8444444 40.8561111)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9737209 40.630353)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9974633 40.7161816)\nPOINT (-73.9837703 40.7162871)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.8979807 40.8442012)\nPOINT (-74.1055194 40.574106)\nPOINT (-74.1055194 40.574106)\nPOINT (-73.9974633 40.7161816)\nPOINT (-73.9974633 40.7161816)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.9001068 40.8540411)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.895512 40.8161856)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9741762 40.6809072)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9974633 40.7161816)\nPOINT (-73.9837703 40.7162871)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9974633 40.7161816)\nPOINT (-73.869946 40.745239)\nPOINT (-73.9547439 40.7430399)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9741762 40.6809072)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.9974633 40.7161816)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.992602 40.742185)\nPOINT (-73.992602 40.742185)\nPOINT (-73.953204 40.726806)\nPOINT (-74.1055194 40.574106)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9416067 40.6279617)\nPOINT (-74.1621293 40.6052621)\nPOINT (-74.0774176 40.6446438)\nPOINT (-73.8444444 40.8561111)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9604873 40.5941714)\nPOINT (-74.1055194 40.574106)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0774176 40.6446438)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.992602 40.742185)\nPOINT (-74.1621293 40.6052621)\nPOINT (-74.1621293 40.6052621)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9986494 40.7426975)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.992602 40.742185)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.899523 40.702873)\nPOINT (-73.8273228 40.8308431)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.992602 40.742185)\nPOINT (-73.992602 40.742185)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9001068 40.8540411)\nPOINT (-73.9001068 40.8540411)\nPOINT (-74.0774176 40.6446438)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.1055194 40.574106)\nPOINT (-73.8106267 40.7299492)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.869946 40.745239)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.9437777 40.8288745)\nPOINT (-73.9565359 40.81469)\nPOINT (-73.9565359 40.81469)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.967428 40.7964779)\nPOINT (-74.0010756 40.658188)\nPOINT (-73.9604873 40.5941714)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.967428 40.7964779)\nPOINT (-74.0010756 40.658188)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9357366 40.8405867)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9750749 40.7841202)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.941118 40.8006901)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.8269924 40.7623558)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9741762 40.6809072)\nPOINT (-73.9741762 40.6809072)\nPOINT (-73.9737209 40.630353)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9737209 40.630353)\nPOINT (-73.9453969 40.8157476)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9741762 40.6809072)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.992602 40.742185)\nPOINT (-74.0029999 40.6025772)\nPOINT (-73.8269924 40.7623558)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9760975 40.576515)\nPOINT (-73.941118 40.8006901)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9750749 40.7841202)\nPOINT (-74.0029999 40.6025772)\nPOINT (-74.0226356 40.6389639)\nPOINT (-73.9437777 40.8288745)\nPOINT (-73.9604873 40.5941714)\nPOINT (-74.0029999 40.6025772)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0226356 40.6389639)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.992602 40.742185)\nPOINT (-74.0226356 40.6389639)\nPOINT (-74.0226356 40.6389639)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9565359 40.81469)\nPOINT (-73.9974633 40.7161816)\nPOINT (-73.992602 40.742185)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.9353245 40.851467)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9974633 40.7161816)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.947884 40.6645423)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9453969 40.8157476)\nPOINT (-73.9472169 40.7891815)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.869946 40.745239)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.953204 40.726806)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.8444444 40.8561111)\nPOINT (-73.8273228 40.8308431)\nPOINT (-74.0226356 40.6389639)\nPOINT (-73.9760975 40.576515)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.9049613 40.6484905)\nPOINT (-74.0010756 40.658188)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.899523 40.702873)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9974633 40.7161816)\nPOINT (-73.9547439 40.7430399)\nPOINT (-73.9974633 40.7161816)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.9505747 40.7064072)\nPOINT (-73.869946 40.745239)\nPOINT (-74.1055194 40.574106)\nPOINT (-73.8397494 40.6821986)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.7758415 40.6799224)\nPOINT (-73.8979807 40.8442012)\nPOINT (-73.8475 40.8875)\nPOINT (-73.8475 40.8875)\nPOINT (-73.9741762 40.6809072)\nPOINT (-73.9760975 40.576515)\nPOINT (-73.9447061 40.6888386)\nPOINT (-73.869946 40.745239)\nPOINT (-73.9447061 40.6888386)\nPOINT (-73.947884 40.6645423)\nPOINT (-73.9353245 40.851467)\nPOINT (-73.8204516 40.6766506)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.8698072 40.822877)\nPOINT (-74.0774176 40.6446438)\nPOINT (-73.9135433 40.6707838)\nPOINT (-73.9604873 40.5941714)\nPOINT (-73.9547439 40.7430399)\nPOINT (-73.9547439 40.7430399)\nPOINT (-73.9760975 40.576515)\nPOINT (-73.8814587 40.6711703)\nPOINT (-73.8814587 40.6711703)\nPOINT (-73.9598669 40.6487106)\nPOINT (-73.9195052 40.8376206)\nPOINT (-73.8475 40.8875)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.8475 40.8875)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.869946 40.745239)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9913549 40.6257785)\nPOINT (-73.9986494 40.7426975)\nPOINT (-73.9195052 40.8376206)\nPOINT (-73.947884 40.6645423)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.9447061 40.6888386)\nPOINT (-73.8106267 40.7299492)\nPOINT (-73.9135433 40.6707838)\nPOINT (-73.851115 40.7222459)\nPOINT (-74.0029999 40.6025772)\nPOINT (-73.7676997 40.7602789)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.9302453 40.6747739)\nPOINT (-73.9974633 40.7161816)\nPOINT (-73.9604845 40.6900842)\nPOINT (-73.9604845 40.6900842)\nPOINT (-73.9604845 40.6900842)\nPOINT (-73.8164846 40.5862476)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.9178713 40.6981536)\nPOINT (-73.9741762 40.6809072)\nPOINT (-73.9741762 40.6809072)\nPOINT (-73.9741762 40.6809072)\nPOINT (-73.8796555 40.8690538)\nPOINT (-74.2499783 40.5118439)\nPOINT (-73.8796555 40.8690538)\nPOINT (-73.9024173 40.8834823)\nPOINT (-73.9024173 40.8834823)\nPOINT (-73.8814587 40.6711703)\nPOINT (-73.8814587 40.6711703)\nPOINT (-73.8814587 40.6711703)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.895512 40.8161856)\nPOINT (-73.9505747 40.7064072)\nPOINT (-73.9505747 40.7064072)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.7351006 40.7262893)\nPOINT (-73.7351006 40.7262893)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.7351006 40.7262893)\nPOINT (-73.7351006 40.7262893)\nPOINT (-73.992602 40.742185)\nPOINT (-74.0010756 40.658188)\nPOINT (-73.7351006 40.7262893)\nPOINT (-73.7351006 40.7262893)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.8444444 40.8561111)\nPOINT (-73.8444444 40.8561111)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.95019 40.6487689)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.8814587 40.6711703)\nPOINT (-73.9505747 40.7064072)\nPOINT (-73.992602 40.742185)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9447061 40.6888386)\nPOINT (-73.9135433 40.6707838)\nPOINT (-73.992602 40.742185)\nPOINT (-73.947884 40.6645423)\nPOINT (-73.947884 40.6645423)\nPOINT (-73.9001068 40.8540411)\nPOINT (-73.9001068 40.8540411)\nPOINT (-73.9505747 40.7064072)\nPOINT (-73.9302453 40.6747739)\nPOINT (-73.9302453 40.6747739)\nPOINT (-73.8814587 40.6711703)\nPOINT (-73.9447061 40.6888386)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.9242145 40.6897012)\nPOINT (-73.9242145 40.6897012)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.95019 40.6487689)\nPOINT (-74.1055194 40.574106)\nPOINT (-74.1055194 40.574106)\nPOINT (-73.9913549 40.6257785)\nPOINT (-73.9913549 40.6257785)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.7758415 40.6799224)\nPOINT (-73.9453969 40.8157476)\nPOINT (-73.992602 40.742185)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9302453 40.6747739)\nPOINT (-73.9302453 40.6747739)\nPOINT (-73.9302453 40.6747739)\nPOINT (-73.9437777 40.8288745)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.9113094 40.8224393)\nPOINT (-73.9604873 40.5941714)\nPOINT (-73.9049613 40.6484905)\nPOINT (-73.941118 40.8006901)\nPOINT (-73.9049613 40.6484905)\nPOINT (-73.9472169 40.7891815)\nPOINT (-73.9472169 40.7891815)\nPOINT (-73.9737209 40.630353)\nPOINT (-73.9453969 40.8157476)\nPOINT (-73.8397494 40.6821986)\nPOINT (-73.8397494 40.6821986)\nPOINT (-73.8397494 40.6821986)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.941118 40.8006901)\nPOINT (-73.8698072 40.822877)\nPOINT (-73.8698072 40.822877)\nPOINT (-73.9760975 40.576515)\nPOINT (-73.9913549 40.6257785)\nPOINT (-73.95019 40.6487689)\nPOINT (-74.0029999 40.6025772)\nPOINT (-73.9178713 40.6981536)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9638697 40.7670729)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9357366 40.8405867)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9049613 40.6484905)\nPOINT (-73.9913549 40.6257785)\nPOINT (-73.9913549 40.6257785)\nPOINT (-73.9750749 40.7841202)\nPOINT (-73.941118 40.8006901)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.9447061 40.6888386)\nPOINT (-73.9453969 40.8157476)\nPOINT (-73.9453969 40.8157476)\nPOINT (-74.0001931 40.6838397)\nPOINT (-74.0001931 40.6838397)\nPOINT (-73.9565359 40.81469)\nPOINT (-73.8755332 40.7568436)\nPOINT (-73.869946 40.745239)\nPOINT (-73.941118 40.8006901)\nPOINT (-73.8755332 40.7568436)\nPOINT (-73.9353245 40.851467)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9707859 40.7567621)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9357366 40.8405867)\nPOINT (-73.9357366 40.8405867)\nPOINT (-74.1621293 40.6052621)\nPOINT (-74.1055194 40.574106)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.967428 40.7964779)\nPOINT (-73.895512 40.8161856)\nPOINT (-73.895512 40.8161856)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9565359 40.81469)\nPOINT (-73.9437777 40.8288745)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9707859 40.7567621)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.9830904 40.6953224)\nPOINT (-73.9913549 40.6257785)\nPOINT (-73.9913549 40.6257785)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9830904 40.6953224)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9837703 40.7162871)\nPOINT (-73.9357366 40.8405867)\nPOINT (-73.9837703 40.7162871)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9049613 40.6484905)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.95019 40.6487689)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9913549 40.6257785)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.9913549 40.6257785)\nPOINT (-73.8273228 40.8308431)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.8444444 40.8561111)\nPOINT (-73.947884 40.6645423)\nPOINT (-73.9913549 40.6257785)\nPOINT (-73.8814587 40.6711703)\nPOINT (-73.8814587 40.6711703)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9750749 40.7841202)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9737209 40.630353)\nPOINT (-73.992602 40.742185)\nPOINT (-73.992602 40.742185)\nPOINT (-73.941118 40.8006901)\nPOINT (-73.941118 40.8006901)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9357366 40.8405867)\nPOINT (-73.9357366 40.8405867)\nPOINT (-73.9113094 40.8224393)\nPOINT (-73.992602 40.742185)\nPOINT (-74.1621293 40.6052621)\nPOINT (-73.9453969 40.8157476)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.8755332 40.7568436)\nPOINT (-73.8204516 40.6766506)\nPOINT (-73.9353245 40.851467)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9547439 40.7430399)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.899523 40.702873)\nPOINT (-73.899523 40.702873)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.899523 40.702873)\nPOINT (-73.851115 40.7222459)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.851115 40.7222459)\nPOINT (-73.9353245 40.851467)\nPOINT (-73.9353245 40.851467)\nPOINT (-73.9565359 40.81469)\nPOINT (-73.953204 40.726806)\nPOINT (-73.9505747 40.7064072)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.8269924 40.7623558)\nPOINT (-73.9353245 40.851467)\nPOINT (-73.9437777 40.8288745)\nPOINT (-74.1055194 40.574106)\nPOINT (-73.9638697 40.7670729)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.9041923 40.767446)\nPOINT (-73.9741762 40.6809072)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.1055194 40.574106)\nPOINT (-73.992602 40.742185)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.992602 40.742185)\nPOINT (-73.9447061 40.6888386)\nPOINT (-73.9453969 40.8157476)\nPOINT (-73.9760975 40.576515)\nPOINT (-73.9760975 40.576515)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9750749 40.7841202)\nPOINT (-74.0083416 40.7205994)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9447061 40.6888386)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.925216 40.8103299)\nPOINT (-73.9357366 40.8405867)\nPOINT (-73.9353245 40.851467)\nPOINT (-74.0083416 40.7205994)\nPOINT (-73.9760975 40.576515)\n"
+          },
+          {
+            "type": "HTML",
+            "data": "<div class=\"result-alert alert-warning\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>Output is truncated</strong> to 1000 rows. Learn more about <strong>zeppelin.spark.maxResult</strong></div>\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590931112670_1438798322",
+      "id": "paragraph_1590927785966_-2085407049",
+      "dateCreated": "2020-05-31T15:18:32+0200",
+      "dateStarted": "2020-05-31T20:18:54+0200",
+      "dateFinished": "2020-05-31T20:18:55+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:191"
+    },
+    {
+      "text": "val checkIfWeekEnd: Int => String = (arg: Int) => {if (arg < 6) \"Week day\" else \"Week-end day\"}\nval checkIfWeekEndUdf = udf(checkIfWeekEnd)\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T11:55:59+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mcheckIfWeekEnd\u001b[0m: \u001b[1m\u001b[32mInt => String\u001b[0m = <function1>\n\u001b[1m\u001b[34mcheckIfWeekEndUdf\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.expressions.UserDefinedFunction\u001b[0m = UserDefinedFunction(<function1>,StringType,Some(List(IntegerType)))\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1591696542469_1024055557",
+      "id": "paragraph_1591696542469_1024055557",
+      "dateCreated": "2020-06-09T11:55:42+0200",
+      "dateStarted": "2020-06-09T11:55:59+0200",
+      "dateFinished": "2020-06-09T11:56:00+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:192"
+    },
+    {
+      "text": "\nz.show(dfNYPDMessages.withColumn(\"date\",\n      to_timestamp(col(\"date\"), \"yyyy-MM-dd'T'HH:mm:ss\"))\n      .withColumn(\"week_day_number\", date_format(col(\"date\"), \"u\"))\n      .withColumn(\"Type of day\", checkIfWeekEndUdf(col(\"week_day_number\")))\n      .groupBy(\"Type of day\")\n      .count()\n      )\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T11:57:35+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Type of day": "string",
+                      "count": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Type of day",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "count",
+                  "index": 1,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Type of day\tcount\nWeek day\t1367308\nWeek-end day\t241690\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590940044560_234468198",
+      "id": "paragraph_1590940044560_234468198",
+      "dateCreated": "2020-05-31T17:47:24+0200",
+      "dateStarted": "2020-06-09T11:56:29+0200",
+      "dateFinished": "2020-06-09T11:57:29+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:193"
+    },
+    {
+      "text": "def avgTypeOfDay = udf((data: String, count: Int) => {\n    if (data == \"Week day\") count / 5 else count / 2\n} )\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T12:27:18+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mavgTypeOfDay\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.expressions.UserDefinedFunction\u001b[0m\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1591698401959_1160249407",
+      "id": "paragraph_1591698401959_1160249407",
+      "dateCreated": "2020-06-09T12:26:41+0200",
+      "dateStarted": "2020-06-09T12:27:18+0200",
+      "dateFinished": "2020-06-09T12:27:18+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:194"
+    },
+    {
+      "title": "Average Infraction on Mon-Fri and Sat-Sun for NYPD data",
+      "text": "z.show(    \n    dfNYPDMessages.withColumn(\"date\",\n          to_timestamp(col(\"date\"), \"yyyy-MM-dd'T'HH:mm:ss\"))\n          .withColumn(\"week_day_number\", date_format(col(\"date\"), \"u\"))\n          .withColumn(\"Type of day\", checkIfWeekEndUdf(col(\"week_day_number\")))\n          .groupBy(\"Type of day\")\n          .count()\n          .withColumn(\"Average infractions\", avgTypeOfDay(col(\"Type of day\"), col(\"count\")))\n          .select(\"Type of day\", \"Average infractions\")\n)\n      ",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T12:57:29+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {
+                    "columns": [
+                      {
+                        "name": "Type of day0",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "count1",
+                        "visible": false,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "Avg2",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      }
+                    ],
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
+                    },
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1,
+                      "paginationPageSize": 250
+                    }
+                  },
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Type of day": "string",
+                      "Average infractions": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Type of day",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Average infractions",
+                  "index": 1,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Type of day\tAverage infractions\nWeek day\t273461\nWeek-end day\t120845\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1591696878432_-1303092832",
+      "id": "paragraph_1591696878432_-1303092832",
+      "dateCreated": "2020-06-09T12:01:18+0200",
+      "dateStarted": "2020-06-09T12:33:34+0200",
+      "dateFinished": "2020-06-09T12:34:38+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:195"
+    },
+    {
+      "title": "Average Infraction on Mon-Fri and Sat-Sun for Drone data",
+      "text": "z.show(    \n    dfRegMessages.withColumn(\"date\",\n          to_timestamp(col(\"date\"), \"yyyy-MM-dd'T'HH:mm:ss\"))\n          .withColumn(\"week_day_number\", date_format(col(\"date\"), \"u\"))\n          .withColumn(\"Type of day\", checkIfWeekEndUdf(col(\"week_day_number\")))\n          .groupBy(\"Type of day\")\n          .count()\n          .na.drop()\n          .withColumn(\"Average infractions\", avgTypeOfDay(col(\"Type of day\"), col(\"count\")))\n          .select(\"Type of day\", \"Average infractions\")\n)\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T12:57:40+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Type of day": "string",
+                      "Average infractions": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Type of day",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Average infractions",
+                  "index": 1,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Type of day\tAverage infractions\nWeek day\t1593\nWeek-end day\t1573\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1591700114910_-554054810",
+      "id": "paragraph_1591700114910_-554054810",
+      "dateCreated": "2020-06-09T12:55:14+0200",
+      "dateStarted": "2020-06-09T12:56:57+0200",
+      "dateFinished": "2020-06-09T12:57:00+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:196"
+    },
+    {
+      "text": "val checkIfDayTime: Int => String = (arg: Int) => {if (arg > 6 && arg < 21) \"Day Time\" else \"NightTime\"}\nval checkIfDayTimeUdf = udf(checkIfDayTime)\nval checkIfDayTime: Int => String = (arg: Int) => {if (arg > 6 && arg < 21) \"Day Time\" else \"NightTime\"}\nval checkIfDayTimeUdf = udf(checkIfDayTime)\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T12:46:44+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mcheckIfDayTime\u001b[0m: \u001b[1m\u001b[32mInt => String\u001b[0m = <function1>\n\u001b[1m\u001b[34mcheckIfDayTimeUdf\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.expressions.UserDefinedFunction\u001b[0m = UserDefinedFunction(<function1>,StringType,Some(List(IntegerType)))\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1591696634670_-2042067214",
+      "id": "paragraph_1591696634670_-2042067214",
+      "dateCreated": "2020-06-09T11:57:14+0200",
+      "dateStarted": "2020-06-09T11:58:43+0200",
+      "dateFinished": "2020-06-09T11:58:44+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:197"
+    },
+    {
+      "title": "Total Violations on Day-Time vs Night-Time for NYPD data",
+      "text": "\nz.show(\n    dfNYPDMessages.withColumn(\"date\",\n      to_timestamp(col(\"date\"), \"yyyy-MM-dd'T'HH:mm:ss\"))\n      .withColumn(\"Hour of Violation\", date_format(col(\"date\"), \"HH\"))\n      .withColumn(\"Type of Hour\", checkIfDayTimeUdf(col(\"Hour of Violation\")))\n      .groupBy(\"Type of Hour\")\n      .count()\n  )\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T12:56:40+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Type of Hour": "string",
+                      "count": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Type of Hour",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "count",
+                  "index": 1,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Type of Hour\tcount\nDay Time\t1437011\nNightTime\t171987\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1591696536559_605243605",
+      "id": "paragraph_1591696536559_605243605",
+      "dateCreated": "2020-06-09T11:55:36+0200",
+      "dateStarted": "2020-06-09T11:58:53+0200",
+      "dateFinished": "2020-06-09T11:59:21+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:198"
+    },
+    {
+      "text": "def avgTypeOfHour = udf((data: String, count: Int) => {\n    if (data == \"Day Time\") count / 14 else count / 10\n} )",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T12:41:59+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mavgTypeOfHour\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.expressions.UserDefinedFunction\u001b[0m\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1591699053784_908451200",
+      "id": "paragraph_1591699053784_908451200",
+      "dateCreated": "2020-06-09T12:37:33+0200",
+      "dateStarted": "2020-06-09T12:41:59+0200",
+      "dateFinished": "2020-06-09T12:41:59+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:199"
+    },
+    {
+      "title": "Average Violations on Day-Time vs Night-Time for NYPD data",
+      "text": "z.show(    \n    dfNYPDMessages.withColumn(\"date\",\n      to_timestamp(col(\"date\"), \"yyyy-MM-dd'T'HH:mm:ss\"))\n      .withColumn(\"Hour of Violation\", date_format(col(\"date\"), \"HH\"))\n      .withColumn(\"Type of Hour\", checkIfDayTimeUdf(col(\"Hour of Violation\")))\n      .groupBy(\"Type of Hour\")\n      .count()\n      .withColumn(\"Average infractions\", avgTypeOfHour(col(\"Type of Hour\"), col(\"count\")))\n      .select(\"Type of Hour\", \"Average infractions\")\n)",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T12:56:28+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Type of Hour": "string",
+                      "Average infractions": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Type of Hour",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Average infractions",
+                  "index": 1,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Type of Hour\tAverage infractions\nDay Time\t102643\nNightTime\t17198\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1591696733494_-1029006450",
+      "id": "paragraph_1591696733494_-1029006450",
+      "dateCreated": "2020-06-09T11:58:53+0200",
+      "dateStarted": "2020-06-09T12:42:01+0200",
+      "dateFinished": "2020-06-09T12:42:50+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:200"
+    },
+    {
+      "title": "Average Violations on Day-Time vs Night-Time for Drone data",
+      "text": "z.show(    \n    dfRegMessages.withColumn(\"date\",\n      to_timestamp(col(\"date\"), \"yyyy-MM-dd'T'HH:mm:ss\"))\n      .withColumn(\"Hour of Violation\", date_format(col(\"date\"), \"HH\"))\n      .withColumn(\"Type of Hour\", checkIfDayTimeUdf(col(\"Hour of Violation\")))\n      .groupBy(\"Type of Hour\")\n      .count()\n      .na.drop()\n      .withColumn(\"Average infractions\", avgTypeOfHour(col(\"Type of Hour\"), col(\"count\")))\n      .select(\"Type of Hour\", \"Average infractions\")\n)",
+      "user": "anonymous",
+      "dateUpdated": "2020-06-09T12:54:51+0200",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Type of Hour": "string",
+                      "Average infractions": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Type of Hour",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Average infractions",
+                  "index": 1,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Type of Hour\tAverage infractions\nDay Time\t460\nNightTime\t465\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1591699311765_2051858153",
+      "id": "paragraph_1591699311765_2051858153",
+      "dateCreated": "2020-06-09T12:41:51+0200",
+      "dateStarted": "2020-06-09T12:51:23+0200",
+      "dateFinished": "2020-06-09T12:51:27+0200",
+      "status": "FINISHED",
+      "$$hashKey": "object:201"
+    },
+    {
+      "user": "anonymous",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1591699723028_-909120341",
+      "id": "paragraph_1591699723028_-909120341",
+      "dateCreated": "2020-06-09T12:48:43+0200",
+      "status": "READY",
+      "$$hashKey": "object:202"
+    }
+  ],
+  "name": "AnayseNYPD",
+  "id": "2F946RQFG",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-preview1",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {},
+  "path": "/AnayseNYPD"
+}
