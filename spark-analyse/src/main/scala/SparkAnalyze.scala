@@ -1,8 +1,5 @@
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
-import org.apache.spark.sql.{Column, Dataset, Row, SparkSession}
-import org.apache.spark.sql.expressions.UserDefinedFunction
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.functions.{date_format, to_timestamp, udf}
 import Utils.{ConnectToS3, readDroneMessageCsv}
@@ -50,14 +47,71 @@ object SparkAnalyze  {
 
 
 
+    dfRegMessages.filter("violationCode IS NOT null").
+      groupBy("violationCode").
+      count()
+      .orderBy("violationCode")
+      .show()
+
+    dfRegMessages.withColumn("date",
+      to_timestamp(col("date"), "yyyy-MM-dd'T'HH:mm:ss"))
+      .withColumn("week_day_number", date_format(col("date"), "u"))
+      .withColumn("Day of the week of violation", date_format(col("date"), "E"))
+      .filter("violationId IS NOT NULL")
+      .groupBy("Day of the week of violation")
+      .count()
+      .orderBy("count")
+      .na.drop()
+      .show()
+
+    val checkIfWeekEnd: Int => String = (arg: Int) => {if (arg < 6) "Week day" else "Week-end day"}
+    val checkIfWeekEndUdf = udf(checkIfWeekEnd)
+
+
     dfNYPDMessages.withColumn("date",
       to_timestamp(col("date"), "yyyy-MM-dd'T'HH:mm:ss"))
       .withColumn("week_day_number", date_format(col("date"), "u"))
-      .withColumn("week_day_abb", date_format(col("date"), "E"))
+      .withColumn("Type of day", checkIfWeekEndUdf(col("week_day_number")))
+      .groupBy("Type of day")
+      .count()
+      .show()
+    dfRegMessages.withColumn("date",
+      to_timestamp(col("date"), "yyyy-MM-dd'T'HH:mm:ss"))
+      .withColumn("week_day_number", date_format(col("date"), "u"))
+      .withColumn("Type of day", checkIfWeekEndUdf(col("week_day_number")))
+      .groupBy("Type of day")
+      .count()
       .show()
 
 
 
+    dfRegMessages.withColumn("date",
+      to_timestamp(col("date"), "yyyy-MM-dd'T'HH:mm:ss"))
+      .withColumn("Hour of Violation", date_format(col("date"), "HH"))
+      .filter("violationId IS NOT NULL").groupBy("Hour of Violation")
+      .count()
+      .orderBy("Hour of Violation")
+      .na.drop()
+      .show()
+
+    val checkIfDayTime: Int => String = (arg: Int) => {if (arg > 6 && arg < 21) "Day Time" else "NightTime"}
+    val checkIfDayTimeUdf = udf(checkIfDayTime)
+
+
+    dfNYPDMessages.withColumn("date",
+      to_timestamp(col("date"), "yyyy-MM-dd'T'HH:mm:ss"))
+      .withColumn("Hour of Violation", date_format(col("date"), "HH"))
+      .withColumn("Type of Hour", checkIfDayTimeUdf(col("Hour of Violation")))
+      .groupBy("Type of Hour")
+      .count()
+      .show()
+    dfRegMessages.withColumn("date",
+      to_timestamp(col("date"), "yyyy-MM-dd'T'HH:mm:ss"))
+      .withColumn("Hour of Violation", date_format(col("date"), "HH"))
+      .withColumn("Type of Hour", checkIfDayTimeUdf(col("Hour of Violation")))
+      .groupBy("Type of Hour")
+      .count()
+      .show()
 
   }
 
